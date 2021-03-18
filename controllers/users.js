@@ -13,9 +13,7 @@ const getUser = (req, res, next) => User.findById(req.user._id)
     }
     res.send(user);
   })
-  .catch((err) => {
-    next(err);
-  });
+  .catch(next);
 
 const updateUserProfile = (req, res, next) => {
   const { email, name } = req.body;
@@ -28,9 +26,14 @@ const updateUserProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные запроса');
+        const errorBadRequest = new BadRequest('Переданы некорректные данные запроса');
+        return next(errorBadRequest);
       }
-      next(err);
+      if (err.name === 'MongoError') {
+        const errorBadRequest = new BadRequest('передан email другого пользователя');
+        return next(errorBadRequest);
+      }
+      return next(err);
     });
 };
 
@@ -53,9 +56,7 @@ const createUser = (req, res, next) => {
       email: user.email,
       name: user.name,
     }))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const login = (req, res, next) => {
@@ -65,9 +66,7 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       return res.send({ token });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {

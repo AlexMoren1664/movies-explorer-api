@@ -18,18 +18,17 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
   name: {
     type: String,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    minLength: 2,
+    maxLength: 30,
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
+function findUserByCredentials(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
@@ -43,6 +42,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
           return user;
         });
     });
-};
+}
+userSchema.statics.findUserByCredentials = findUserByCredentials;
 
 module.exports = mongoose.model('user', userSchema);

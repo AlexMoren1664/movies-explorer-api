@@ -9,9 +9,7 @@ const getMovies = (req, res, next) => {
     .then((movies) => {
       res.send(movies);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const createMovie = (req, res, next) => {
@@ -46,11 +44,22 @@ const createMovie = (req, res, next) => {
       if (!movie) {
         throw new BadRequest('Некорректные данные запроса');
       }
-      res.send(movie);
+      res.send({
+        _id: movie._id,
+        movieId: movie.movieId,
+        country: movie.country,
+        director: movie.director,
+        duration: movie.duration,
+        year: movie.year,
+        description: movie.description,
+        image: movie.image,
+        trailer: movie.trailer,
+        nameRU: movie.nameRU,
+        nameEN: movie.nameEN,
+        thumbnail: movie.thumbnail,
+      });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const deleteMovie = (req, res, next) => {
@@ -69,7 +78,8 @@ const deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.CastError) {
-        throw new BadRequest('Запрос не был обработан, неверные данные');
+        const errorBadRequest = new BadRequest('Запрос не был обработан, неверные данные');
+        next(errorBadRequest);
       }
       next(err);
     });
