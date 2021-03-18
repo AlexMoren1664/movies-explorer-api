@@ -26,4 +26,5 @@ router.use('/', auth, moviesRouter);
 router.use('*', () => {
   throw new NotFound('Запрашиваемый ресурс не найден');
 });
+
 module.exports = router;

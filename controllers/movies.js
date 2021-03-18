@@ -63,7 +63,7 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.movieId)
+  Movie.findById(req.params.movieId).select('+owner')
     .orFail(() => {
       throw new NotFound('Фильм не найден');
     })
@@ -79,9 +79,9 @@ const deleteMovie = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.CastError) {
         const errorBadRequest = new BadRequest('Запрос не был обработан, неверные данные');
-        next(errorBadRequest);
+        return next(errorBadRequest);
       }
-      next(err);
+      return next(err);
     });
 };
 
